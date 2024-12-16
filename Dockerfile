@@ -33,9 +33,15 @@ tensorflow_model_server --port=8500 --rest_api_port=8501 \
 "$@"' > /usr/bin/tf_serving_entrypoint.sh \
 && chmod +x /usr/bin/tf_serving_entrypoint.sh
 
+RUN echo '#!/bin/bash \n\n\
+tensorflow_model_server --port=8500 --rest_api_port=8501 \
+--model_config_file=${MODEL_FILE_PATH} \
+"$@"' > /usr/bin/tf_serving_entrypoint_multiple_models.sh \
+&& chmod +x /usr/bin/tf_serving_entrypoint_multiple_models.sh
+
 # Create user
 RUN useradd -u 1250 -M -r serving \
     && chown -R serving: /models
 USER serving
 
-ENTRYPOINT ["/usr/bin/tf_serving_entrypoint.sh"]
+ENTRYPOINT ["/usr/bin/tf_serving_entrypoint_multiple_models.sh"]
